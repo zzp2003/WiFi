@@ -89,17 +89,25 @@ class CampusNetAuth:
                 'ip': self.config['wlanuserip']
             }
 
-            # 发送登录请求
-            response = self.session.post(
+            # 添加Cookie并发送GET请求
+            self.headers['Cookie'] = f'remember={self.config["remember_cookie"]}'
+            
+            # 构造GET请求参数
+            response = self.session.get(
                 self.config['login_url'],
-                data=login_data,
+                params=login_data,
                 headers=self.headers,
-                timeout=10
+                timeout=10,
+                allow_redirects=True
             )
 
-            # 检查登录是否成功
-            success_indicators = ['success', 'success_mobile']
-            if any(indicator in response.url.lower() for indicator in success_indicators):
+            # 检查重定向历史
+            if any('srun_portal_success' in r.url for r in response.history):
+                logging.info('成功跳转到认证成功页面')
+                return True
+
+            # 根据新接口响应格式检查登录结果
+            if response.status_code == 200 and ('login_ok' in response.text or 'srun_portal_success' in response.url):
                 logging.info('登录成功')
                 return True
             else:
