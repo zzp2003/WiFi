@@ -1,0 +1,21 @@
+# Python
+__pycache__/
+*.py[cod]
+*.so
+
+# Logs
+*.log
+
+# Sensitive data
+login/config.json
+data/
+users_data*.xlsx
+
+# IDE
+.vscode/
+.idea/
+
+# Environment
+.env
+venv/
+.venv/
